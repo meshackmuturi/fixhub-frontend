@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Registration - FixHub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 50%, #fbbf24 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .back-home {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: #fbbf24;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .back-home:hover { transform: translateY(-2px); }
+
+        .container { max-width: 600px; margin: 0 auto; }
+
+        .header {
+            background: #000;
+            border: 2px solid #fbbf24;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .logo-display {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            font-family: 'Arial Black', Arial, sans-serif;
+        }
+
+        .logo-fix { color: white; }
+        .logo-hub {
+            background: #fbbf24;
+            color: #000;
+            padding: 2px 18px;
+            border-radius: 6px;
+            margin-left: 2px;
+        }
+
+        .header p { color: #ccc; font-size: 16px; }
+
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #fbbf24;
+        }
+
+        .form-group { margin-bottom: 25px; }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .required { color: #ef4444; }
+        .optional {
+            color: #999;
+            font-weight: 400;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #fde68a;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Nunito', sans-serif;
+            background: #fffbeb;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #fbbf24;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .phone-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            padding: 14px 16px;
+            background: #f3f4f6;
+            border: 2px solid #fde68a;
+            border-radius: 12px;
+            font-weight: 700;
+            color: #000;
+            font-size: 15px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .phone-input {
+            flex: 1;
+        }
+
+        .form-hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .error-hint {
+            font-size: 13px;
+            color: #ef4444;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .success-modal.show { display: flex; }
+
+        .success-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 450px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #fbbf24;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .success-content h2 {
+            font-size: 26px;
+            margin-bottom: 12px;
+            color: #000;
+        }
+
+        .success-content p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .customer-id-display {
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .customer-id-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .customer-id-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .phone-input-group {
+                flex-direction: column;
+            }
+            .country-code {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="Home page.html" class="back-home">← Back to Home</a>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo-display">
+                <span class="logo-fix">Fix</span><span class="logo-hub">Hub</span>
+            </div>
+            <p>Register New Customer</p>
+        </div>
+
+        <div class="form-card">
+            <form id="registrationForm">
+                <div class="section-title">Customer Information</div>
+
+                <div class="form-group">
+                    <label class="form-label">Full Name <span class="required">*</span></label>
+                    <input 
+                        type="text" 
+                        id="fullName" 
+                        class="form-input" 
+                        placeholder="e.g., John Kamau"
+                        required
+                        minlength="3"
+                    >
+                    <div class="form-hint">Enter customer's full name (minimum 3 characters)</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number <span class="required">*</span></label>
+                    <div class="phone-input-group">
+                        <div class="country-code">+254</div>
+                        <input 
+                            type="tel" 
+                            id="phoneNumber" 
+                            class="form-input phone-input" 
+                            placeholder="712345678"
+                            required
+                            pattern="[0-9]{9}"
+                            maxlength="9"
+                        >
+                    </div>
+                    <div class="form-hint">Enter 9 digits without leading 0 (e.g., 712345678)</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address <span class="optional">(Optional)</span></label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        class="form-input" 
+                        placeholder="customer@example.com"
+                    >
+                    <div class="form-hint">Email is optional but recommended for notifications</div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    ✓ Register Customer
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="success-modal" id="modal">
+        <div class="success-content">
+            <div class="success-icon">✓</div>
+            <h2>Registration Successful!</h2>
+            <p>Customer has been registered successfully</p>
+
+            <div class="customer-id-display">
+                <div class="customer-id-label">Customer ID</div>
+                <div class="customer-id-value" id="customerId">CUST-000001</div>
+            </div>
+
+            <button class="btn-primary" onclick="goToDashboard()">Go to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('registrationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const fullNameInput = document.getElementById('fullName');
+        const phoneInput = document.getElementById('phoneNumber');
+        const emailInput = document.getElementById('email');
+
+        // Real-time validation
+        fullNameInput.addEventListener('input', function() {
+            if (this.value.length > 0 && this.value.length < 3) {
+                this.classList.add('error');
+            } else {
+                this.classList.remove('error');
+            }
+        });
+
+        phoneInput.addEventListener('input', function() {
+            // Only allow numbers
+            this.value = this.value.replace(/[^0-9]/g, '');
+            
+            if (this.value.length > 0 && this.value.length !== 9) {
+                this.classList.add('error');
+            } else {
+                this.classList.remove('error');
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Get form data
+            const fullName = fullNameInput.value.trim();
+            const phoneNumber = phoneInput.value.trim();
+            const email = emailInput.value.trim();
+
+            // Validate
+            if (fullName.length < 3) {
+                alert('Full name must be at least 3 characters');
+                fullNameInput.focus();
+                return;
+            }
+
+            if (phoneNumber.length !== 9) {
+                alert('Phone number must be exactly 9 digits');
+                phoneInput.focus();
+                return;
+            }
+
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Registering...';
+
+            try {
+                // Send to backend
+                const response = await fetch('http://127.0.0.1:8000/api/register-customer/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        fullName: fullName,
+                        phoneNumber: '+254' + phoneNumber,
+                        email: email || ''
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show customer ID from database
+                    document.getElementById('customerId').textContent = data.customer_id;
+                    document.getElementById('modal').classList.add('show');
+                    
+                    // Reset form
+                    form.reset();
+                    
+                    console.log('Customer registered:', data);
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to register customer'));
+                    console.error('Backend error:', data);
+                }
+            } catch (error) {
+                console.error('Connection error:', error);
+                alert('Failed to connect to backend!\n\nMake sure:\n1. Backend is running (python manage.py runserver)\n2. You are connected to the internet');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Register Customer';
+            }
+        });
+
+        // Go to dashboard after registration
+        function goToDashboard() {
+            window.location.href = 'Dashboard.html';
+        }
+    </script>
+</body>
+</html>

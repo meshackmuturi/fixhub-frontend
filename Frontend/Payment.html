@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - FixHub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 50%, #fbbf24 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .back-dashboard {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: #fbbf24;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .back-dashboard:hover { transform: translateY(-2px); }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .header {
+            background: #000;
+            border: 2px solid #fbbf24;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .logo-display {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            font-family: 'Arial Black', Arial, sans-serif;
+        }
+
+        .logo-fix { color: white; }
+        .logo-hub {
+            background: #fbbf24;
+            color: #000;
+            padding: 2px 18px;
+            border-radius: 6px;
+            margin-left: 2px;
+        }
+
+        .header p { color: #ccc; font-size: 16px; }
+
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #fbbf24;
+        }
+
+        .form-group { margin-bottom: 25px; position: relative; }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .required { color: #ef4444; }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #fde68a;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Nunito', sans-serif;
+            background: #fffbeb;
+        }
+
+        .form-input:read-only {
+            background: #f3f4f6;
+            cursor: not-allowed;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #fbbf24;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1);
+        }
+
+        /* Search Dropdown */
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-dropdown.show { display: block; }
+
+        .search-item {
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #fde68a;
+            transition: background 0.2s;
+        }
+
+        .search-item:hover { background: #fffbeb; }
+        .search-item:last-child { border-bottom: none; }
+
+        .search-item-name {
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 4px;
+        }
+
+        .search-item-details {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #999;
+        }
+
+        .amount-display {
+            background: #000;
+            color: #fbbf24;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+            border: 2px solid #fbbf24;
+        }
+
+        .amount-label {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 8px;
+        }
+
+        .amount-value {
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .payment-option { position: relative; }
+
+        .payment-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .payment-label {
+            display: block;
+            padding: 20px;
+            background: #fffbeb;
+            border: 2px solid #fde68a;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-option input[type="radio"]:checked + .payment-label {
+            background: #fbbf24;
+            border-color: #f59e0b;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+        }
+
+        .payment-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .payment-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #000;
+        }
+
+        .mpesa-section {
+            display: none;
+            background: #fffbeb;
+            border: 2px solid #fde68a;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .mpesa-section.show { display: block; }
+
+        .mpesa-instructions {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .mpesa-instructions ol {
+            margin-left: 20px;
+        }
+
+        .mpesa-instructions li {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .success-modal.show { display: flex; }
+
+        .success-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #10b981;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+
+        .success-content h2 {
+            font-size: 26px;
+            margin-bottom: 12px;
+            color: #000;
+        }
+
+        .success-content p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .receipt {
+            background: #fffbeb;
+            border: 2px solid #fde68a;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #fde68a;
+        }
+
+        .receipt-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .payment-methods { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="Dashboard.html" class="back-dashboard">← Dashboard</a>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo-display">
+                <span class="logo-fix">Fix</span><span class="logo-hub">Hub</span>
+            </div>
+            <p>Process Payment</p>
+        </div>
+
+        <div class="form-card">
+            <form id="paymentForm">
+                <div class="section-title">Search Customer & Job</div>
+
+                <div class="form-group">
+                    <label class="form-label">Search Customer <span class="required">*</span></label>
+                    <input 
+                        type="text" 
+                        id="customerSearch" 
+                        class="form-input" 
+                        placeholder="Type customer name or phone number..."
+                        autocomplete="off"
+                        required
+                    >
+                    <div class="search-dropdown" id="searchDropdown"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Customer Name</label>
+                    <input type="text" id="customerName" class="form-input" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" id="customerPhone" class="form-input" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="customerEmail" class="form-input" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Job ID</label>
+                    <input type="text" id="jobId" class="form-input" readonly>
+                </div>
+
+                <div class="amount-display">
+                    <div class="amount-label">Amount to Pay</div>
+                    <div class="amount-value">KSH <span id="amountValue">0</span></div>
+                </div>
+
+                <div class="section-title">Payment Method</div>
+
+                <div class="payment-methods">
+                    <div class="payment-option">
+                        <input type="radio" id="method-cash" name="payment_method" value="cash" checked>
+                        <label for="method-cash" class="payment-label">
+                            <div class="payment-icon">💵</div>
+                            <div class="payment-name">Cash</div>
+                        </label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" id="method-mpesa" name="payment_method" value="mpesa">
+                        <label for="method-mpesa" class="payment-label">
+                            <div class="payment-icon">📱</div>
+                            <div class="payment-name">M-PESA</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mpesa-section" id="mpesaSection">
+                    <h4 style="margin-bottom: 15px;">M-PESA Payment Instructions</h4>
+                    
+                    <div class="mpesa-instructions">
+                        <ol>
+                            <li>Click "Send M-PESA Prompt" below</li>
+                            <li>Check your phone for M-PESA notification</li>
+                            <li>Enter your M-PESA PIN to confirm payment</li>
+                            <li>Wait for confirmation</li>
+                        </ol>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">M-PESA Phone Number</label>
+                        <input type="tel" id="mpesaPhone" class="form-input" placeholder="+254712345678">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    💳 Process Payment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="success-modal" id="successModal">
+        <div class="success-content">
+            <div class="success-icon">✓</div>
+            <h2>Payment Successful!</h2>
+            <p>Payment has been processed and saved to database</p>
+
+            <div class="receipt">
+                <div class="receipt-row">
+                    <span>Job ID:</span>
+                    <span id="receiptJobId">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Customer:</span>
+                    <span id="receiptCustomer">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Payment Method:</span>
+                    <span id="receiptMethod">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Amount Paid:</span>
+                    <span id="receiptAmount">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Date:</span>
+                    <span id="receiptDate">-</span>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="closeModal()">Done</button>
+        </div>
+    </div>
+
+    <script>
+        let allJobs = [];
+        let selectedJob = null;
+
+        // Load unpaid jobs from backend
+        async function loadJobs() {
+            try {
+                const response = await fetch('https://127.0.0.1:8000/api/get-jobs/');
+                const data = await response.json();
+
+                if (data.success) {
+                    // Filter only unpaid/partial jobs
+                    allJobs = data.jobs.filter(j => j.payment_status !== 'paid');
+                    console.log('Loaded', allJobs.length, 'unpaid jobs');
+                } else {
+                    console.error('Error loading jobs');
+                }
+            } catch (error) {
+                console.error('Bkend not connected:', error);
+            }
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('customerSearch');
+        const searchDropdown = document.getElementById('searchDropdown');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+
+            if (searchTerm.length < 2) {
+                searchDropdown.classList.remove('show');
+                return;
+            }
+
+            // Filter jobs by customer name or phone
+            const filtered = allJobs.filter(job => 
+                job.customer_name.toLowerCase().includes(searchTerm) ||
+                job.customer_phone.includes(searchTerm)
+            );
+
+            if (filtered.length === 0) {
+                searchDropdown.innerHTML = '<div class="no-results">No unpaid jobs found</div>';
+                searchDropdown.classList.add('show');
+                return;
+            }
+
+            // Display results
+            searchDropdown.innerHTML = filtered.map(job => `
+                <div class="search-item" onclick='selectJob(${JSON.stringify(job).replace(/'/g, "&#39;")})'>
+                    <div class="search-item-name">${job.customer_name}</div>
+                    <div class="search-item-details">
+                        ${job.customer_phone} • ${job.job_id} • KSH ${parseFloat(job.cost).toLocaleString()}
+                    </div>
+                </div>
+            `).join('');
+
+            searchDropdown.classList.add('show');
+        });
+
+        // Click outside to close dropdown
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.form-group')) {
+                searchDropdown.classList.remove('show');
+            }
+        });
+
+        // Select job from search results
+        function selectJob(job) {
+            selectedJob = job;
+
+            searchInput.value = job.customer_name;
+            document.getElementById('customerName').value = job.customer_name;
+            document.getElementById('customerPhone').value = job.customer_phone;
+            document.getElementById('customerEmail').value = job.customer_email || 'Not provided';
+            document.getElementById('jobId').value = job.job_id;
+            document.getElementById('amountValue').textContent = parseFloat(job.cost).toLocaleString();
+            document.getElementById('mpesaPhone').value = job.customer_phone;
+
+            searchDropdown.classList.remove('show');
+        }
+
+        // Payment method toggle
+        document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const mpesaSection = document.getElementById('mpesaSection');
+                const submitBtn = document.getElementById('submitBtn');
+
+                if (this.value === 'mpesa') {
+                    mpesaSection.classList.add('show');
+                    submitBtn.textContent = '📱 Send M-PESA Prompt';
+                } else {
+                    mpesaSection.classList.remove('show');
+                    submitBtn.textContent = '💳 Process Payment';
+                }
+            });
+        });
+
+        // Form submission with backend processing
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!selectedJob) {
+                alert('Please search and select a customer');
+                return;
+            }
+
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            const submitBtn = document.getElementById('submitBtn');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+
+            // M-PESA prompt simulation
+            if (paymentMethod === 'mpesa') {
+                const mpesaPhone = document.getElementById('mpesaPhone').value;
+                
+                if (!mpesaPhone) {
+                    alert('Please enter M-PESA phone number');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '📱 Send M-PESA Prompt';
+                    return;
+                }
+
+                alert(`M-PESA Prompt Sent!\n\nCheck phone ${mpesaPhone}\nEnter PIN to complete payment of KSH ${document.getElementById('amountValue').textContent}`);
+                
+                // Simulate waiting for customer to enter PIN
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            }
+
+            try {
+                // Send payment to backend
+                const paymentData = {
+                    job_id: selectedJob.id,
+                    amount: selectedJob.cost,
+                    method: paymentMethod,
+                    mpesa_code: paymentMethod === 'mpesa' ? document.getElementById('mpesaPhone').value : '',
+                    notes: `Payment for ${selectedJob.job_id} via ${paymentMethod}`
+                };
+
+                const response = await fetch('https://127.0.0.1:8000/api/process-payment/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Fill receipt
+                    document.getElementById('receiptJobId').textContent = selectedJob.job_id;
+                    document.getElementById('receiptCustomer').textContent = selectedJob.customer_name;
+                    document.getElementById('receiptMethod').textContent = paymentMethod === 'cash' ? 'Cash' : 'M-PESA';
+                    document.getElementById('receiptAmount').textContent = 'KSH ' + parseFloat(selectedJob.cost).toLocaleString();
+                    document.getElementById('receiptDate').textContent = new Date().toLocaleDateString();
+
+                    // Show success modal
+                    document.getElementById('successModal').classList.add('show');
+
+                    // Reset form
+                    this.reset();
+                    selectedJob = null;
+                    searchInput.value = '';
+                    document.getElementById('customerName').value = '';
+                    document.getElementById('customerPhone').value = '';
+                    document.getElementById('customerEmail').value = '';
+                    document.getElementById('jobId').value = '';
+                    document.getElementById('amountValue').textContent = '0';
+
+                    console.log('✅ Payment processed:', data);
+                } else {
+                    alert('Error processing payment: ' + data.error);
+                    console.error('❌ Backend error:', data);
+                }
+
+            } catch (error) {
+                console.error('❌ Connection error:', error);
+                alert('Failed to process payment!\n\nMake sure backend is running.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = paymentMethod === 'mpesa' ? '📱 Send M-PESA Prompt' : '💳 Process Payment';
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('show');
+            window.location.href = 'Dashboard.html';
+        }
+
+        // Load jobs when page loads
+        window.addEventListener('DOMContentLoaded', loadJobs);
+    </script>
+</body>
+</html>
